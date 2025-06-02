@@ -3,29 +3,28 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
-class AddItemScreen extends StatefulWidget {
-  const AddItemScreen({Key? key}) : super(key: key);
+class AddProductPage extends StatefulWidget {
+  const AddProductPage({Key? key}) : super(key: key);
 
   @override
-  State<AddItemScreen> createState() => _AddItemScreenState();
+  State<AddProductPage> createState() => _AddProductPageState();
 }
 
-class _AddItemScreenState extends State<AddItemScreen> {
+class _AddProductPageState extends State<AddProductPage> {
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
-  
+
   // Image file
   File? _selectedImage;
-  
+
   // Class level array for item types
   final List<String> _itemTypes = ['Fashion', 'Toys', 'Electronics', 'Books', 'Home', 'Sports', "Fruits"];
-  
+
   // List of additional features tags
   final List<String> _additionalFeatures = [];
-  
+
   // Controller for the tag input field
   final TextEditingController _tagController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -45,14 +44,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
     'additionalFeatures': <String>[],
   };
 
-  // Dio instance for API calls
-  final Dio _dio = Dio();
-  
   // Method to pick image from gallery
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    
+
     if (image != null) {
       setState(() {
         _selectedImage = File(image.path);
@@ -60,7 +56,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       });
     }
   }
-  
+
   // Method to get location from Google Places (placeholder)
   void _pickLocation() async {
     // In a real implementation, this would integrate with Google Places API
@@ -93,7 +89,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       ),
     );
   }
-  
+
   // Method to add a tag to additional features
   void _addTag(String tag) {
     if (tag.isNotEmpty && !_additionalFeatures.contains(tag)) {
@@ -104,7 +100,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       _tagController.clear();
     }
   }
-  
+
   // Method to remove a tag from additional features
   void _removeTag(String tag) {
     setState(() {
@@ -112,12 +108,12 @@ class _AddItemScreenState extends State<AddItemScreen> {
       _formData['additionalFeatures'] = _additionalFeatures;
     });
   }
-  
+
   // Method to submit the form
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      
+
       // Validate image
       if (_formData['image'] == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,20 +121,20 @@ class _AddItemScreenState extends State<AddItemScreen> {
         );
         return;
       }
-      
+
       // Display loading indicator
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => const Center(child: CircularProgressIndicator()),
       );
-      
+
       try {
         // Convert image to MultipartFile
-        final imageFile = await MultipartFile.fromFile(_formData['image']);
-        
+        final imageFile = _formData['image'];
+
         // Create FormData object
-        final formData = FormData.fromMap({
+        final formData = {
           'image': imageFile,
           'location': _formData['location'],
           'itemType': _formData['itemType'],
@@ -146,34 +142,16 @@ class _AddItemScreenState extends State<AddItemScreen> {
           'title': _formData['title'],
           'description': _formData['description'],
           'additionalFeatures': _formData['additionalFeatures'],
-        });
-        
-        // Send POST request to server
-        final response = await _dio.post(
-          'https://your-api-endpoint.com/items',
-          data: formData,
+        };
+
+        // Hide loading indicator
+        Navigator.of(context).pop();
+
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Item added successfully')),
         );
-        
-        // Hide loading indicator
-        Navigator.of(context).pop();
-        
-        // Handle response
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Item added successfully')),
-          );
-          
-          // Optional: Navigate back or clear form
-          Navigator.of(context).pop();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to add item: ${response.statusMessage}')),
-          );
-        }
       } catch (e) {
-        // Hide loading indicator
-        Navigator.of(context).pop();
-        
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.toString()}')),
@@ -191,25 +169,16 @@ class _AddItemScreenState extends State<AddItemScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Add Image Section
-              const Text(
-                'Add Image',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3643),
-                ),
-              ),
-              const SizedBox(height: 10),
               GestureDetector(
                 onTap: _pickImage,
                 child: Container(
                   width: double.infinity,
-                  height: 138,
+                  height: 188,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(9),
                     border: Border.all(
@@ -220,25 +189,25 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   ),
                   child: _selectedImage != null
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _selectedImage!,
-                            fit: BoxFit.cover,
-                          ),
-                        )
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      _selectedImage!,
+                      fit: BoxFit.cover,
+                    ),
+                  )
                       : const Center(
-                          child: Text(
-                            'Upload Image',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF25ADDE),
-                            ),
-                          ),
-                        ),
+                    child: Text(
+                      'Upload Image',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF25ADDE),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
 
               // Location Field
               const Text(
@@ -281,7 +250,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
 
 
               // Price Dropdown
@@ -318,10 +287,91 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
 
-
+              ElevatedButton(
+                onPressed: generateAIContent,
+                child: const Text(
+                  'Generate AI Content',
+                ),
+              ),
+              const SizedBox(height: 20),
               // Item Type Dropdown
+
+
+
+              // Title Field
+              const Text(
+                'Title',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D3643),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  hintText: 'Title for item',
+                  hintStyle: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFABB5C5),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: const BorderSide(color: Color(0xFFD3D5DA)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                ),
+                onSaved: (value) {
+                  _formData['title'] = value ?? '';
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+
+              // Description Field
+              const Text(
+                'Description',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D3643),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  hintText: 'Description here',
+                  hintStyle: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFABB5C5),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: const BorderSide(color: Color(0xFFD3D5DA)),
+                  ),
+                  contentPadding: const EdgeInsets.all(15),
+                ),
+                maxLines: 10,
+                onSaved: (value) {
+                  _formData['description'] = value ?? '';
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a description';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
               const Text(
                 'Item Type',
                 style: TextStyle(
@@ -363,82 +413,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 30),
-
-
-              // Title Field
-              const Text(
-                'Title',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3643),
-                ),
-              ),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  hintText: 'Title for item',
-                  hintStyle: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFABB5C5),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: const BorderSide(color: Color(0xFFD3D5DA)),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                ),
-                onSaved: (value) {
-                  _formData['title'] = value ?? '';
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 30),
-              
-              // Description Field
-              const Text(
-                'Description',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3643),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  hintText: 'Description here',
-                  hintStyle: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFFABB5C5),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: const BorderSide(color: Color(0xFFD3D5DA)),
-                  ),
-                  contentPadding: const EdgeInsets.all(15),
-                ),
-                maxLines: 10,
-                onSaved: (value) {
-                  _formData['description'] = value ?? '';
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 30),
-              
               // Additional Features
               const Text(
                 'Additional Features',
@@ -463,8 +438,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       children: _additionalFeatures.map((tag) {
                         return Chip(label: Text(tag,
                           style: TextStyle(
-                          fontSize: 10
-                        ),));
+                              fontSize: 10
+                          ),));
                       }).toList(),
                     ),
                     const SizedBox(height: 10),
@@ -497,19 +472,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              
+
               // Add Button
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: Row(
                   children: [
-                    ElevatedButton(
-                      onPressed: generateAIContent,
-                      child: const Text(
-                        'Generate AI Content',
-                      ),
-                    ),
                     ElevatedButton(
                       onPressed: _submitForm,
 
@@ -520,7 +489,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -544,31 +513,30 @@ class _AddItemScreenState extends State<AddItemScreen> {
         model: "gemini-2.5-pro-preview-05-06",
         apiKey: apiKey,
         generationConfig: GenerationConfig(
-          responseMimeType: "application/json",
-          responseSchema: Schema.object(
+            responseMimeType: "application/json",
+            responseSchema: Schema.object(
               properties: {
                 "title" : Schema.string(),
                 "description" : Schema.string(),
                 "type" : Schema.enumString(
-                  enumValues: _itemTypes,
-                  description: "The type of the item"
+                    enumValues: _itemTypes,
+                    description: "The type of the item"
                 ),
                 "features" : Schema.array(items: Schema.string())
               },
-            // Crucially, define which properties MUST be in the response:
-            requiredProperties: [
-              "title",
-              "description",
-              "features",
-              "type",
-            ],
-              )
+              // Crucially, define which properties MUST be in the response:
+              requiredProperties: [
+                "title",
+                "description",
+                "features",
+                "type",
+              ],
+            )
 
         )
     );
   }
   void  generateAIContent() async {
-
     if (_selectedImage == null) return;
 
     String prompt = "I'm listing this item for sale at online market";
@@ -583,14 +551,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
     prompt = "$prompt. Help me write a appealing title, 10 lines of description, type and features of this item."
         " The tone should be natural.";
     print("gemini prompt is $prompt");
+
+
     final content = Content.multi(
-      [
-        TextPart(prompt),
-        DataPart("image/png", _selectedImage!.readAsBytesSync())
-      ]
+        [
+          TextPart(prompt),
+          DataPart("image/png", _selectedImage!.readAsBytesSync())
+        ]
     );
     var response = await _model.generateContent([content]);
-    print("gemini response is ${response.text}");
     var responseJson = jsonDecode(response.text);
 
     _titleController.text = responseJson["title"] ?? "";
@@ -603,7 +572,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       }
     }
     setState(() {
-
+      //to refresh UI
     });
   }
 }

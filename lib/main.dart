@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-
+import 'generate_text.dart';
 import 'add_item_dart.dart';
 
 void main() {
@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -33,11 +34,12 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: getFirstPageOfTheApp(),
+      home: const AddProductPage(),
     );
   }
   getFirstPageOfTheApp() {
-    return const AddItemScreen();
+
+    // return const AddItemScreen();
     return const MyHomePage(title: 'Flutter Demo Home Page');
   }
 }

@@ -1,16 +1,26 @@
-# build_with_ai_25
+# Build With AI - Gemini For Smarter Apps
 
-Power your apps with Gemini
+This repository contains the source code and resources for the **"Build With AI - Gemini For Smarter Apps"** codelab organized by [GDGLahore](http://gdglahore.com) at Techlogix Lahore. May 31, 2025.
 
-## Getting Started
+Explore how to integrate Google's Gemini API into a Flutter app to build smart, AI-powered experiences. You'll see how to:
 
-This project is a starting point for a Flutter application.
+- Build a simple Flutter UI
+- Use Gemini to generate intelligent text responses
+- Auto-generate product details using text and image input
+- Understand schema-guided AI content generation
 
-A few resources to get you started if this is your first Flutter project:
+This project is designed for developers interested in building intelligent applications using Flutter and generative AI.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Follow the Codelab
+
+View the complete step-by-step guide here:  
+**[http://adilsoomro.github.io/buildwai-codelab](http://adilsoomro.github.io/buildwai-codelab)**
+
+---
+
+![Preview](https://raw.githubusercontent.com/AdilSoomro/buildwai-codelab/refs/heads/main/img/preview-buildwai.jpg)
+
+Created by [**Adil Soomro** ](https://booleanbites.com)
+For workshops, learning sessions, and Flutter AI experiments.
